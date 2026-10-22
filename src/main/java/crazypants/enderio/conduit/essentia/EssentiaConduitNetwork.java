@@ -1,7 +1,6 @@
 package crazypants.enderio.conduit.essentia;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraftforge.common.util.ForgeDirection;
@@ -37,11 +36,11 @@ public class EssentiaConduitNetwork extends AbstractConduitNetwork<IEssentiaCond
 
     @Override
     public void doNetworkTick() {
-        if (delay > 0) {
+        if (delay >= 0) {
             delay--;
             return;
         }
-        delay = Math.max(1, Config.essentiaConduitTransferInterval) - 1; // a cycle every <interval> ticks
+        delay = Config.essentiaConduitTransferInterval;
 
         List<EssentiaConnection> sources = new ArrayList<>();
         List<EssentiaConnection> targets = new ArrayList<>();
@@ -68,7 +67,7 @@ public class EssentiaConduitNetwork extends AbstractConduitNetwork<IEssentiaCond
         if (sources.isEmpty() || targets.isEmpty()) {
             return;
         }
-        Collections.sort(targets, (a, b) -> Integer.compare(b.priority, a.priority));
+        targets.sort((a, b) -> Integer.compare(b.priority, a.priority));
 
         for (EssentiaConnection src : sources) {
             AspectList list = src.container.getAspects();
@@ -82,7 +81,8 @@ public class EssentiaConduitNetwork extends AbstractConduitNetwork<IEssentiaCond
                     break;
                 }
                 if (aspect != null) {
-                    budget -= route(src, targets, aspect, budget);
+                    int available = list.getAmount(aspect);
+                    budget -= route(src, targets, aspect, Math.min(budget, available));
                 }
             }
         }
@@ -114,12 +114,11 @@ public class EssentiaConduitNetwork extends AbstractConduitNetwork<IEssentiaCond
      * duplicated when a container rejects part of the amount.
      */
     private static int transfer(IAspectContainer from, IAspectContainer to, Aspect aspect, int amount) {
-        int toMove = Math.min(amount, from.containerContains(aspect));
-        if (toMove <= 0) {
+        if (amount <= 0) {
             return 0;
         }
         // addToContainer returns the amount that did NOT fit
-        int accepted = toMove - to.addToContainer(aspect, toMove);
+        int accepted = amount - to.addToContainer(aspect, amount);
         if (accepted <= 0) {
             return 0;
         }
