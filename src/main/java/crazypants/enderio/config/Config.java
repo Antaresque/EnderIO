@@ -138,6 +138,9 @@ public final class Config {
     public static int gasConduitExtractRate = 200;
     public static int gasConduitMaxIoRate = 800;
 
+    public static int[] essentiaConduitRates = { 4, 16, 32, 999 };
+    public static int essentiaConduitTransferInterval = 10;
+
     public static boolean updateLightingWhenHidingFacades = false;
 
     public static boolean travelAnchorEnabled = true;

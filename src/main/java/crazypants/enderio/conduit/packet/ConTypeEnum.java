@@ -1,6 +1,7 @@
 package crazypants.enderio.conduit.packet;
 
 import crazypants.enderio.conduit.IConduit;
+import crazypants.enderio.conduit.essentia.IEssentiaConduit;
 import crazypants.enderio.conduit.gas.IGasConduit;
 import crazypants.enderio.conduit.item.IItemConduit;
 import crazypants.enderio.conduit.liquid.ILiquidConduit;
@@ -17,7 +18,8 @@ public enum ConTypeEnum {
     REDSTONE(IRedstoneConduit.class),
     GAS(IGasConduit.class),
     ME(IMEConduit.class),
-    OC(IOCConduit.class);
+    OC(IOCConduit.class),
+    ESSENTIA(IEssentiaConduit.class);
 
     final Class<? extends IConduit> baseType;
 

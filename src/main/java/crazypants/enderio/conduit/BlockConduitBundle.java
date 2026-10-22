@@ -56,13 +56,7 @@ import crazypants.enderio.conduit.gui.PacketSlotVisibility;
 import crazypants.enderio.conduit.gui.item.PacketExistingItemFilterSnapshot;
 import crazypants.enderio.conduit.gui.item.PacketModItemFilter;
 import crazypants.enderio.conduit.liquid.PacketFluidLevel;
-import crazypants.enderio.conduit.packet.PacketConnectionMode;
-import crazypants.enderio.conduit.packet.PacketExtractMode;
-import crazypants.enderio.conduit.packet.PacketItemConduitFilter;
-import crazypants.enderio.conduit.packet.PacketOCConduitSignalColor;
-import crazypants.enderio.conduit.packet.PacketRedstoneConduitOutputStrength;
-import crazypants.enderio.conduit.packet.PacketRedstoneConduitSignalColor;
-import crazypants.enderio.conduit.packet.PacketRoundRobinMode;
+import crazypants.enderio.conduit.packet.*;
 import crazypants.enderio.conduit.redstone.IInsulatedRedstoneConduit;
 import crazypants.enderio.conduit.redstone.IRedstoneConduit;
 import crazypants.enderio.conduit.redstone.InsulatedRedstoneConduit;
@@ -152,6 +146,11 @@ public class BlockConduitBundle extends BlockEio
         PacketHandler.INSTANCE.registerMessage(
                 PacketRoundRobinMode.class,
                 PacketRoundRobinMode.class,
+                PacketHandler.nextID(),
+                Side.SERVER);
+        PacketHandler.INSTANCE.registerMessage(
+                PacketEssentiaConduit.class,
+                PacketEssentiaConduit.class,
                 PacketHandler.nextID(),
                 Side.SERVER);
 

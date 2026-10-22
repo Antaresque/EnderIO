@@ -3,6 +3,7 @@ package crazypants.enderio.conduit.gui;
 import com.enderio.core.api.client.gui.ITabPanel;
 
 import crazypants.enderio.conduit.IConduit;
+import crazypants.enderio.conduit.essentia.IEssentiaConduit;
 import crazypants.enderio.conduit.gas.IGasConduit;
 import crazypants.enderio.conduit.gui.item.ItemSettings;
 import crazypants.enderio.conduit.item.IItemConduit;
@@ -34,6 +35,8 @@ public class TabFactory {
             return new MESettings(gui, con);
         } else if (baseType.isAssignableFrom(IOCConduit.class)) {
             return new OCSettings(gui, con);
+        } else if (baseType.isAssignableFrom(IEssentiaConduit.class)) {
+            return new EssentiaSettings(gui, con);
         }
         return null;
     }

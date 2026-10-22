@@ -21,6 +21,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import com.enderio.core.common.util.BlockCoord;
 
 import crazypants.enderio.EnderIO;
+import crazypants.enderio.conduit.essentia.EssentiaConduitNetwork;
+import crazypants.enderio.conduit.essentia.IEssentiaConduit;
 import crazypants.enderio.conduit.gas.GasConduitNetwork;
 import crazypants.enderio.conduit.gas.IGasConduit;
 import crazypants.enderio.conduit.geom.CollidableCache;
@@ -692,6 +694,8 @@ public abstract class AbstractConduit implements IConduit {
             return new MEConduitNetwork();
         } else if (IOCConduit.class.isAssignableFrom(type)) {
             return new OCConduitNetwork();
+        } else if (IEssentiaConduit.class.isAssignableFrom(type)) {
+            return new EssentiaConduitNetwork();
         } else {
             return null;
         }

@@ -53,6 +53,7 @@ import crazypants.enderio.block.BlockDarkSteelPressurePlate;
 import crazypants.enderio.block.BlockReinforcedObsidian;
 import crazypants.enderio.conduit.BlockConduitBundle;
 import crazypants.enderio.conduit.ConduitRecipes;
+import crazypants.enderio.conduit.essentia.ItemEssentiaConduit;
 import crazypants.enderio.conduit.facade.BlockConduitFacade;
 import crazypants.enderio.conduit.facade.ItemConduitFacade;
 import crazypants.enderio.conduit.gas.ItemGasConduit;
@@ -270,6 +271,7 @@ public class EnderIO {
     public static ItemGasConduit itemGasConduit;
     public static ItemMEConduit itemMEConduit;
     public static ItemOCConduit itemOCConduit;
+    public static ItemEssentiaConduit itemEssentiaConduit;
     public static ItemBasicItemFilter itemBasicFilterUpgrade;
     public static ItemBigItemFilter itemBigFilterUpgrade;
     public static ItemExistingItemFilter itemExistingItemFilter;
@@ -470,6 +472,7 @@ public class EnderIO {
         itemPowerConduitEndergy = ItemPowerConduitEndergy.create();
         itemLiquidConduit = ItemLiquidConduit.create();
         itemItemConduit = ItemItemConduit.create();
+        itemEssentiaConduit = ItemEssentiaConduit.create();
         itemGasConduit = ItemGasConduit.create();
         itemMEConduit = ItemMEConduit.create();
         itemOCConduit = ItemOCConduit.create();

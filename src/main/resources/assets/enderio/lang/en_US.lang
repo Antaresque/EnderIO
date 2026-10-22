@@ -151,6 +151,12 @@ enderio.itemMEConduit.channelsUsed={0,number} of {1,number} Channels
 item.itemOCConduit.name=Network Conduit (OC)
 enderio.itemOCConduit.name=Network Conduit (OC)
 
+item.itemEssentiaConduit.name=Essentia Conduit
+enderio.itemEssentiaConduit.name=Essentia Conduit
+enderio.itemEssentiaConduitThaumium.name=Thaumium Essentia Conduit
+enderio.itemEssentiaConduitVoid.name=Void-Infused Essentia Conduit
+enderio.itemEssentiaConduitIchorium.name=Ichorium Essentia Conduit
+
 #Entity
 entity.witherSkeleton.name=Wither Skeleton
 

@@ -27,6 +27,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import crazypants.enderio.conduit.BlockConduitBundle;
 import crazypants.enderio.conduit.IConduit;
+import crazypants.enderio.conduit.essentia.EssentiaConduit;
 import crazypants.enderio.conduit.facade.FacadeRenderer;
 import crazypants.enderio.conduit.gas.GasConduit;
 import crazypants.enderio.conduit.gas.GasUtil;
@@ -204,6 +205,7 @@ public class ClientProxy extends CommonProxy {
         MelodicEnderLiquidConduit.initIcons();
         StellarEnderLiquidConduit.initIcons();
         ItemConduit.initIcons();
+        EssentiaConduit.initIcons();
         if (GasUtil.isGasConduitEnabled()) {
             GasConduit.initIcons();
         }
@@ -336,6 +338,7 @@ public class ClientProxy extends CommonProxy {
         MinecraftForgeClient.registerItemRenderer(EnderIO.itemGasConduit, itemConRenderer);
         MinecraftForgeClient.registerItemRenderer(EnderIO.itemMEConduit, itemConRenderer);
         MinecraftForgeClient.registerItemRenderer(EnderIO.itemOCConduit, itemConRenderer);
+        MinecraftForgeClient.registerItemRenderer(EnderIO.itemEssentiaConduit, itemConRenderer);
 
         BlockPaintedFenceGateRenderer bcfgr = new BlockPaintedFenceGateRenderer();
         BlockPaintedFenceGate.renderId = RenderingRegistry.getNextAvailableRenderId();
