@@ -12,9 +12,10 @@ public class ItemEssentiaConduit extends AbstractItemConduit {
 
     private static final ItemConduitSubtype[] subtypes = new ItemConduitSubtype[] {
             new ItemConduitSubtype(ModObject.itemEssentiaConduit.name(), "enderio:itemEssentiaConduit"),
-            new ItemConduitSubtype(ModObject.itemEssentiaConduit.name() + "Thaumium", "enderio:itemEssentiaConduit"),
-            new ItemConduitSubtype(ModObject.itemEssentiaConduit.name() + "Void", "enderio:itemEssentiaConduit"),
-            new ItemConduitSubtype(ModObject.itemEssentiaConduit.name() + "Ichorium", "enderio:itemEssentiaConduit"), };
+            new ItemConduitSubtype(ModObject.itemEssentiaConduit.name() + "Void", "enderio:itemEssentiaConduitVoid"),
+            new ItemConduitSubtype(
+                    ModObject.itemEssentiaConduit.name() + "Ichorium",
+                    "enderio:itemEssentiaConduitIchorium"), };
 
     public static ItemEssentiaConduit create() {
         ItemEssentiaConduit result = new ItemEssentiaConduit();
