@@ -2,11 +2,9 @@ package crazypants.enderio.conduit.essentia;
 
 import static crazypants.enderio.conduit.item.ItemConduit.EXTERNAL_INTERFACE_GEOM;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,7 +37,6 @@ import thaumcraft.api.nodes.INode;
 
 public class EssentiaConduit extends AbstractConduit implements IEssentiaConduit {
 
-    // TODO: temporary item textures
     public static final String ICON_KEY = "enderio:essentiaConduit";
     public static final String ICON_KEY_CORE = "enderio:essentiaConduitCore";
     public static final String ICON_KEY_INPUT = "enderio:essentiaConduitInput";
@@ -71,27 +68,16 @@ public class EssentiaConduit extends AbstractConduit implements IEssentiaConduit
         });
     }
 
-    EssentiaConduitNetwork network;
-
-    protected final EnumMap<ForgeDirection, RedstoneControlMode> extractionModes = new EnumMap<>(ForgeDirection.class);
-    protected final EnumMap<ForgeDirection, DyeColor> extractionColors = new EnumMap<>(ForgeDirection.class);
-    protected final EnumMap<ForgeDirection, Integer> priority = new EnumMap<>(ForgeDirection.class);
-    protected final EnumMap<ForgeDirection, DyeColor> outputColors = new EnumMap<>(ForgeDirection.class);
-    protected final EnumMap<ForgeDirection, DyeColor> inputColors = new EnumMap<>(ForgeDirection.class);
-
-    private int metaData;
+    private EssentiaConduitNetwork network;
+    private final EssentiaConduitMetadata metadata;
 
     public EssentiaConduit() {
-        this(0);
+        this(EssentiaConduitTier.BASIC);
     }
 
-    public EssentiaConduit(int itemDamage) {
-        metaData = itemDamage;
-        updateFromNonUpgradeableVersion();
-    }
-
-    private void updateFromNonUpgradeableVersion() {
-        int filterMeta = metaData;
+    public EssentiaConduit(EssentiaConduitTier tier) {
+        metadata = new EssentiaConduitMetadata(tier);
+        // updateFromNonUpgradeableVersion();
     }
 
     @Override
@@ -99,7 +85,6 @@ public class EssentiaConduit extends AbstractConduit implements IEssentiaConduit
         return EssentiaConduitRenderer.instance.get();
     }
 
-    // region Neighbor logic
     @Override
     public IAspectContainer getExternalContainer(ForgeDirection direction) {
         World world = getBundle().getWorld();
@@ -132,10 +117,12 @@ public class EssentiaConduit extends AbstractConduit implements IEssentiaConduit
 
     @Override
     public int getMaximumExtracted(ForgeDirection dir) {
-        int[] rates = Config.essentiaConduitRates;
-        int tier = metaData;
-        if (tier < 0 || tier > 3) return 1;
-        return rates[tier];
+        EssentiaConduitTier tier = metadata.getTier();
+        return switch (tier) {
+            case BASIC -> Config.essentiaConduitRate;
+            case VOID -> Config.essentiaConduitVoidRate;
+            case ICHOR -> Integer.MAX_VALUE;
+        };
     }
 
     @Override
@@ -147,7 +134,6 @@ public class EssentiaConduit extends AbstractConduit implements IEssentiaConduit
     public Class<? extends IConduit> getBaseConduitType() {
         return IEssentiaConduit.class;
     }
-    // endregion
 
     @Override
     public boolean onBlockActivated(EntityPlayer player, RaytraceResult res, List<RaytraceResult> all) {
@@ -191,98 +177,9 @@ public class EssentiaConduit extends AbstractConduit implements IEssentiaConduit
         return false;
     }
 
-    // region Settings
-    @Override
-    public void setExtractionRedstoneMode(RedstoneControlMode mode, ForgeDirection dir) {
-        extractionModes.put(dir, mode);
-    }
-
-    @Override
-    public RedstoneControlMode getExtractionRedstoneMode(ForgeDirection dir) {
-        RedstoneControlMode res = extractionModes.get(dir);
-        if (res == null) {
-            res = RedstoneControlMode.ON;
-        }
-        return res;
-    }
-
-    @Override
-    public void setExtractionSignalColor(ForgeDirection dir, DyeColor col) {
-        extractionColors.put(dir, col);
-    }
-
-    @Override
-    public DyeColor getExtractionSignalColor(ForgeDirection dir) {
-        DyeColor result = extractionColors.get(dir);
-        if (result == null) {
-            return DyeColor.RED;
-        }
-        return result;
-    }
-
-    @Override
-    public boolean isExtractionRedstoneConditionMet(ForgeDirection dir) {
-        RedstoneControlMode mode = getExtractionRedstoneMode(dir);
-        if (mode == null) {
-            return true;
-        }
-        return ConduitUtil.isRedstoneControlModeMet(getBundle(), mode, getExtractionSignalColor(dir));
-    }
-
-    @Override
-    public int getOutputPriority(ForgeDirection dir) {
-        Integer res = priority.get(dir);
-        if (res == null) {
-            return 0;
-        }
-        return res.intValue();
-    }
-
-    @Override
-    public void setOutputPriority(ForgeDirection dir, int priority) {
-        if (priority == 0) {
-            this.priority.remove(dir);
-        } else {
-            this.priority.put(dir, priority);
-        }
-    }
-
-    @Override
-    public DyeColor getInputColor(ForgeDirection dir) {
-        DyeColor result = inputColors.get(dir);
-        if (result == null) {
-            return DyeColor.GREEN;
-        }
-        return result;
-    }
-
-    @Override
-    public DyeColor getOutputColor(ForgeDirection dir) {
-        DyeColor result = outputColors.get(dir);
-        if (result == null) {
-            return DyeColor.GREEN;
-        }
-        return result;
-    }
-
-    @Override
-    public void setInputColor(ForgeDirection dir, DyeColor col) {
-        inputColors.put(dir, col);
-        setClientStateDirty();
-        collidablesDirty = true;
-    }
-
-    @Override
-    public void setOutputColor(ForgeDirection dir, DyeColor col) {
-        outputColors.put(dir, col);
-        setClientStateDirty();
-        collidablesDirty = true;
-    }
-    // endregion
-
     @Override
     public ItemStack createItem() {
-        return new ItemStack(EnderIO.itemEssentiaConduit, 1, metaData);
+        return new ItemStack(EnderIO.itemEssentiaConduit, 1, metadata.getOrdinalTier());
     }
 
     @Override
@@ -301,18 +198,11 @@ public class EssentiaConduit extends AbstractConduit implements IEssentiaConduit
         return new EssentiaConduitNetwork();
     }
 
-    /*
-     * @Override public IIcon getTextureForState(CollidableComponent component) { if (component.dir ==
-     * ForgeDirection.UNKNOWN) { return ICONS.get(ICON_CORE_KEY); } ConnectionMode mode =
-     * getConnectionMode(component.dir); if (mode == ConnectionMode.INPUT) { return ICONS.get(ICON_EXTRACT_KEY); } if
-     * (mode == ConnectionMode.OUTPUT) { return ICONS.get(ICON_INSERT_KEY); } return ICONS.get(ICON_KEY); }
-     */
     @Override
     public IIcon getTransmitionTextureForState(CollidableComponent component) {
         return null;
     }
 
-    // TODO: temporary
     @Override
     public IIcon getTextureForState(CollidableComponent component) {
         if (component.dir == ForgeDirection.UNKNOWN) {
@@ -348,102 +238,90 @@ public class EssentiaConduit extends AbstractConduit implements IEssentiaConduit
         return ICONS.get(ICON_KEY_CORE);
     }
 
-    // region NBT Data
+    @Override
+    public void setExtractionRedstoneMode(RedstoneControlMode mode, ForgeDirection dir) {
+        metadata.setExtractionRedstoneMode(dir, mode);
+    }
+
+    @Override
+    public RedstoneControlMode getExtractionRedstoneMode(ForgeDirection dir) {
+        return metadata.getExtractionRedstoneMode(dir);
+    }
+
+    @Override
+    public void setExtractionSignalColor(ForgeDirection dir, DyeColor col) {
+        metadata.setExtractionSignalColor(dir, col);
+    }
+
+    @Override
+    public DyeColor getExtractionSignalColor(ForgeDirection dir) {
+        return metadata.getExtractionSignalColor(dir);
+    }
+
+    @Override
+    public boolean isExtractionRedstoneConditionMet(ForgeDirection dir) {
+        RedstoneControlMode mode = getExtractionRedstoneMode(dir);
+        if (mode == null) {
+            return true;
+        }
+        return ConduitUtil.isRedstoneControlModeMet(getBundle(), mode, getExtractionSignalColor(dir));
+    }
+
+    @Override
+    public int getOutputPriority(ForgeDirection dir) {
+        return metadata.getOutputPriority(dir);
+    }
+
+    @Override
+    public void setOutputPriority(ForgeDirection dir, int priority) {
+        metadata.setOutputPriority(dir, priority);
+    }
+
+    @Override
+    public DyeColor getInputColor(ForgeDirection dir) {
+        return metadata.getInputColor(dir);
+    }
+
+    @Override
+    public DyeColor getOutputColor(ForgeDirection dir) {
+        return metadata.getOutputColor(dir);
+    }
+
+    @Override
+    public void setInputColor(ForgeDirection dir, DyeColor col) {
+        metadata.setInputColor(dir, col);
+        setClientStateDirty();
+        collidablesDirty = true;
+    }
+
+    @Override
+    public void setOutputColor(ForgeDirection dir, DyeColor col) {
+        metadata.setOutputColor(dir, col);
+        setClientStateDirty();
+        collidablesDirty = true;
+    }
+
     @Override
     protected void readTypeSettings(ForgeDirection dir, NBTTagCompound dataRoot) {
-        setExtractionSignalColor(dir, DyeColor.VALUES[dataRoot.getShort("extractionSignalColor")]);
-        setExtractionRedstoneMode(RedstoneControlMode.VALUES[dataRoot.getShort("extractionRedstoneMode")], dir);
-        setInputColor(dir, DyeColor.VALUES[dataRoot.getShort("inputColor")]);
-        setOutputColor(dir, DyeColor.VALUES[dataRoot.getShort("outputColor")]);
-        setOutputPriority(dir, dataRoot.getInteger("outputPriority"));
+        metadata.readTypeSettings(dir, dataRoot);
+        setClientStateDirty();
+        collidablesDirty = true;
     }
 
     @Override
     protected void writeTypeSettingsToNbt(ForgeDirection dir, NBTTagCompound dataRoot) {
-        dataRoot.setShort("extractionSignalColor", (short) getExtractionSignalColor(dir).ordinal());
-        dataRoot.setShort("extractionRedstoneMode", (short) getExtractionRedstoneMode(dir).ordinal());
-        dataRoot.setShort("inputColor", (short) getInputColor(dir).ordinal());
-        dataRoot.setShort("outputColor", (short) getOutputColor(dir).ordinal());
-        dataRoot.setInteger("outputPriority", getOutputPriority(dir));
+        metadata.writeTypeSettings(dir, dataRoot);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbtRoot) {
         super.writeToNBT(nbtRoot);
-
-        for (Entry<ForgeDirection, RedstoneControlMode> entry : extractionModes.entrySet()) {
-            if (entry.getValue() != null) {
-                nbtRoot.setShort("extRM." + entry.getKey().name(), (short) entry.getValue().ordinal());
-            }
-        }
-
-        for (Entry<ForgeDirection, DyeColor> entry : extractionColors.entrySet()) {
-            if (entry.getValue() != null) {
-                nbtRoot.setShort("extSC." + entry.getKey().name(), (short) entry.getValue().ordinal());
-            }
-        }
-
-        for (Entry<ForgeDirection, Integer> entry : priority.entrySet()) {
-            if (entry.getValue() != null) {
-                nbtRoot.setInteger("priority." + entry.getKey().name(), entry.getValue());
-            }
-        }
-
-        for (Entry<ForgeDirection, DyeColor> entry : inputColors.entrySet()) {
-            if (entry.getValue() != null) {
-                nbtRoot.setShort("inSC." + entry.getKey().name(), (short) entry.getValue().ordinal());
-            }
-        }
-
-        for (Entry<ForgeDirection, DyeColor> entry : outputColors.entrySet()) {
-            if (entry.getValue() != null) {
-                nbtRoot.setShort("outSC." + entry.getKey().name(), (short) entry.getValue().ordinal());
-            }
-        }
+        metadata.writeToNBT(nbtRoot);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbtRoot, short nbtVersion) {
         super.readFromNBT(nbtRoot, nbtVersion);
-
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-            String key = "extRM." + dir.name();
-            if (nbtRoot.hasKey(key)) {
-                short ord = nbtRoot.getShort(key);
-                if (ord >= 0 && ord < RedstoneControlMode.VALUES.length) {
-                    extractionModes.put(dir, RedstoneControlMode.VALUES[ord]);
-                }
-            }
-
-            key = "extSC." + dir.name();
-            if (nbtRoot.hasKey(key)) {
-                short ord = nbtRoot.getShort(key);
-                if (ord >= 0 && ord < DyeColor.VALUES.length) {
-                    extractionColors.put(dir, DyeColor.VALUES[ord]);
-                }
-            }
-
-            key = "priority." + dir.name();
-            if (nbtRoot.hasKey(key)) {
-                priority.put(dir, nbtRoot.getInteger(key));
-            }
-
-            key = "inSC." + dir.name();
-            if (nbtRoot.hasKey(key)) {
-                short ord = nbtRoot.getShort(key);
-                if (ord >= 0 && ord < DyeColor.VALUES.length) {
-                    inputColors.put(dir, DyeColor.VALUES[ord]);
-                }
-            }
-
-            key = "outSC." + dir.name();
-            if (nbtRoot.hasKey(key)) {
-                short ord = nbtRoot.getShort(key);
-                if (ord >= 0 && ord < DyeColor.VALUES.length) {
-                    outputColors.put(dir, DyeColor.VALUES[ord]);
-                }
-            }
-        }
+        metadata.readFromNBT(nbtRoot);
     }
-    // endregion
 }

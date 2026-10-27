@@ -33,7 +33,6 @@ public interface IEssentiaConduit extends IConduit, IExtractor {
 
     void setOutputColor(ForgeDirection dir, DyeColor col);
 
-    // temporary
     IIcon getTextureForInputMode();
 
     IIcon getTextureForOutputMode();

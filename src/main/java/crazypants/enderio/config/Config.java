@@ -138,7 +138,8 @@ public final class Config {
     public static int gasConduitExtractRate = 200;
     public static int gasConduitMaxIoRate = 800;
 
-    public static int[] essentiaConduitRates = { 4, 16, 32, 999 };
+    public static int essentiaConduitRate = 4;
+    public static int essentiaConduitVoidRate = 32;
     public static int essentiaConduitTransferInterval = 10;
 
     public static boolean updateLightingWhenHidingFacades = false;
@@ -590,7 +591,7 @@ public final class Config {
     public static int telepadPowerPerTickRF = 1000;
     public static int telepadPowerStorageRF = 100000;
 
-    public static boolean inventoryPanelFree = false;;
+    public static boolean inventoryPanelFree = false;
     public static float inventoryPanelPowerPerMB = 800.0f;
     public static float inventoryPanelScanCostPerSlot = 0.1f;
     public static float inventoryPanelExtractCostPerItem = 12.0f;
